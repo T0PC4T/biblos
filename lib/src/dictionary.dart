@@ -1,11 +1,29 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:biblos/src/shared.dart';
-import 'package:biblos/src/static.dart';
+import 'package:biblos/src/services/inflections.dart';
 import 'package:biblos/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_html_css/simple_html_css.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+
+class DictionaryPage extends StatelessWidget {
+  final Map word;
+  const DictionaryPage({super.key, required this.word});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(word["gr"]),
+        backgroundColor: themePrimary,
+        foregroundColor: themeLight,
+      ),
+      body: SingleChildScrollView(
+          child: BottomSheetWidget(minimized: false, word: word)),
+    );
+  }
+}
 
 class BottomSheetWidget extends StatelessWidget {
   final Map word;
@@ -13,107 +31,119 @@ class BottomSheetWidget extends StatelessWidget {
   const BottomSheetWidget(
       {super.key, required this.word, required this.minimized});
 
-  Widget getChild(BuildContext context) {
-    return ColoredBox(
-      color: Theme.of(context).colorScheme.background,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (minimized)
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: Navigator.of(context).pop,
-              child: Container(
-                  color: Theme.of(context).colorScheme.primary,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: 30,
-                  child: Icon(
-                    size: 30,
-                    Icons.arrow_drop_down,
-                    fill: 1,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  )),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      '${word["gr"]}',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Icon(
-                        Icons.volume_up_rounded,
-                        size: 15,
-                      ),
-                    ),
-                    Text(
-                      '${word["tl"]}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (minimized)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: Navigator.of(context).pop,
+            child: Container(
+                color: Theme.of(context).colorScheme.primary,
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: 30,
+                child: Icon(
+                  size: 30,
+                  Icons.arrow_drop_down,
+                  fill: 1,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                )),
+          ),
+        Padding(
+          padding: themePaddingEdgeInset,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SynopsisWidget(word: word),
+              const Divider(
+                height: themePadding * 2,
+              ),
+              if (minimized == true)
+                ElevatedButton(
+                  child: const Text("View Full Entry"),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return DictionaryPage(word: word);
+                      },
+                    ));
+                  },
                 ),
-                Text(
-                  '${word["en"]}',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                Text(
-                  codeToWord(word["pa"]),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Divider(),
-                ),
-                Text(
-                  "From Strong ${word["st"]}:",
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                // Strong entry for the lexical word
+              if (minimized == false)
                 StrongEntryWidget(
                   word: word,
                   entry: word["st"],
-                  minimized: minimized,
                 ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
+}
+
+class SynopsisWidget extends StatelessWidget {
+  const SynopsisWidget({
+    super.key,
+    required this.word,
+  });
+
+  final Map word;
 
   @override
   Widget build(BuildContext context) {
-    if (minimized) {
-      return getChild(context);
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(word["gr"]),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      RichText(
+          text: TextSpan(children: [
+        TextSpan(
+          text: '${word["gr"]}\t\t',
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium
+              ?.copyWith(color: themeDark),
         ),
-        body: SingleChildScrollView(child: getChild(context)),
-      );
-    }
+        const WidgetSpan(
+            child: Icon(
+          Icons.volume_up_rounded,
+          size: 16,
+        )),
+        TextSpan(
+          text: ' ${word["tl"]}\n\n',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        TextSpan(
+          text: 'meaning: ',
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(color: themeDark, fontStyle: FontStyle.italic),
+        ),
+        TextSpan(
+          text: '${word["en"]}\n\n',
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(color: themeDark, fontWeight: FontWeight.bold),
+        ),
+        TextSpan(
+          text: "~${codeToWord(word["pa"]).trim()}",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ]))
+    ]);
   }
 }
 
 class StrongEntryWidget extends StatefulWidget {
   final Map word;
   final String entry;
-  final bool minimized;
   const StrongEntryWidget({
     super.key,
     required this.word,
     required this.entry,
-    required this.minimized,
   });
 
   @override
@@ -122,14 +152,16 @@ class StrongEntryWidget extends StatefulWidget {
 
 class StrongEntryWidgetState extends State<StrongEntryWidget> {
   List<Map> strongData;
+  String? lsData;
 
   StrongEntryWidgetState() : strongData = [];
 
   Future fetchStrong() async {
-    // for (var letter in ["", "a", "b", "c"]) {
-    for (var letter in [""]) {
+    // for (var letter in [""]) {
+    for (var letter in ["", "a", "b", "c"]) {
       final filePath = "assets/Strong/${widget.word['st']}$letter.json";
-      if (true) {
+      final bExists = await File(filePath).exists();
+      if (bExists) {
         final String response = await rootBundle.loadString(filePath);
         final result = jsonDecode(response) as Map;
         if (context.mounted) {
@@ -141,17 +173,35 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
     }
   }
 
+  Future fetchLSJ() async {
+    final filePath = "assets/LSJ/${widget.word['st']}.html";
+    if (await File(filePath).exists()) {
+      final String response = await rootBundle.loadString(filePath);
+      if (context.mounted) {
+        setState(() {
+          lsData = response;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     fetchStrong();
+    fetchLSJ();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.entry);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          "From Strong ${widget.entry}:",
+          style: Theme.of(context).textTheme.labelSmall,
+        ),
         for (var strongDatum in strongData) ...[
           Text(
             '${strongDatum["gr"]}',
@@ -169,171 +219,26 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
             'Usage: ${strongDatum["us"]}',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          if (widget.minimized == false)
-            DictionaryEntryWidget(wordKey: strongDatum["gr"].split(",")[0])
-          else
-            Center(
-              child: Padding(
-                padding: themePaddingEdgeInset,
-                child: ElevatedButton(
-                  child: const Text("Dictionary"),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) {
-                        return BottomSheetWidget(
-                            word: widget.word, minimized: false);
-                      },
-                    ));
-                  },
-                ),
-              ),
-            )
+          const Divider(
+            height: themePadding * 2,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: themePadding),
+            child: Text(
+              "From Liddell & Scott (${strongDatum["gr"]}):",
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          if (lsData case String data)
+            HtmlWidget(
+              data,
+              textStyle: const TextStyle(fontSize: 16),
+              customStylesBuilder: (element) {
+                return {'text-decoration': 'none'};
+              },
+            ),
         ]
       ],
     );
   }
-}
-
-class DictionaryEntryWidget extends StatefulWidget {
-  final String wordKey;
-  const DictionaryEntryWidget({super.key, required this.wordKey});
-
-  @override
-  State<DictionaryEntryWidget> createState() => _DictionaryEntryWidgetState();
-}
-
-class _DictionaryEntryWidgetState extends State<DictionaryEntryWidget> {
-  Map? dictionaryData;
-
-  Future fetchDictionary() async {
-    final String response =
-        await rootBundle.loadString("assets/dictionary.json");
-
-    final result = jsonDecode(response) as Map;
-    if (context.mounted) {
-      setState(() {
-        dictionaryData = result;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    fetchDictionary();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (dictionaryData == null) {
-      return const LoadingWidget();
-    }
-    if (dictionaryData![widget.wordKey] == null) {
-      return Container(
-        width: double.infinity,
-        padding: themePaddingEdgeInset,
-        alignment: Alignment.center,
-        child: Text(
-          "No further details.",
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      );
-    }
-    return Padding(
-      padding: const EdgeInsets.only(top: 40),
-      child: RichText(
-        text: HTML.toTextSpan(context, dictionaryData![widget.wordKey]),
-        //...
-      ),
-    );
-  }
-}
-
-String codeToWord(String code) {
-  // print(code);
-  // TODO "Make sure you've got all the types of words."
-  List<String?> parts = [];
-  switch (code.split("-")) {
-    case [String part]:
-      {
-        parts.add(partsOfSpeech[part]);
-      }
-    case [String part, String details]:
-      {
-        parts.add(partsOfSpeech[part]);
-        if (part == "V") {
-          parts.add(tense[details[0]]);
-          parts.add(mood[details[1]]);
-          parts.add(voice[details[2]]);
-        } else if (part == "Adv") {
-          parts.add(comparison[details[0]]);
-        } else {
-          parts.add(wordCase[details[0]]);
-          if (int.tryParse(details[1]) != null) {
-            parts.add(person[details[1]]);
-            parts.add(number[details[2]]);
-          } else if (int.tryParse(details[2]) != null) {
-            parts.add(gender[details[1]]);
-            parts.add(person[details[2]]);
-            parts.add(number[details[3]]);
-          } else {
-            parts.add(gender[details[1]]);
-            parts.add(number[details[2]]);
-          }
-        }
-      }
-    case [String part, String details, String details2]:
-      {
-        parts.add(partsOfSpeech[part]);
-        if (part == "Adj") {
-          // Comparative Adjective
-          parts.add(wordCase[details[0]]);
-          parts.add(gender[details[1]]);
-          parts.add(number[details[2]]);
-          parts.add(comparison[details2[0]]);
-        }
-
-        if (part == "V") {
-          // Verb
-          // Details One
-          if (details == "M") {
-            parts.add(mood[details[0]]);
-            parts.add(person[details2[0]]);
-            parts.add(number[details2[1]]);
-          } else {
-            parts.add(tense[details[0]]);
-            parts.add(mood[details[1]]);
-            if (details.length > 2) {
-              parts.add(voice[details.substring(2)]);
-            }
-
-            //  Details Two
-            if (details2.length == 3) {
-              // participle
-              parts.add(wordCase[details2[0]]);
-              parts.add(gender[details2[1]]);
-              parts.add(number[details2[2]]);
-            } else {
-              parts.add(person[details2[0]]);
-              parts.add(number[details2[1]]);
-            }
-          }
-        }
-      }
-  }
-  if (parts.contains(null)) {
-    throw "Invalid word $parts";
-  }
-
-  final smallcode = code
-      .split("-")
-      .sublist(1)
-      .fold<String>("", (previousValue, element) => previousValue + element)
-      .replaceAll("M/P", "P");
-
-  if (code.split("-").length > 1 && smallcode.length != parts.length - 1) {
-    throw "Parts are missing $smallcode $code $parts";
-  }
-
-  return parts.fold("", (previousValue, element) => "$previousValue$element ");
 }

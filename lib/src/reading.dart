@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:biblos/main.dart';
 import 'package:biblos/src/dictionary.dart';
-import 'package:biblos/src/services/ls.dart';
-import 'package:biblos/src/static.dart';
+import 'package:biblos/src/services/books.dart';
 import 'package:biblos/theme.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -47,9 +48,8 @@ class ReadingPageState extends State<ReadingPage> {
   }
 
   void bookmark(double scrollOffset) {
-    print("bookmarking ${widget.book} $chapter $scrollOffset");
-    AppDataClass.setBookmark(
-        book: widget.book, chapter: chapter, offset: scrollOffset);
+    AppWidgetState.of(context)!.appData.setBookMark(
+        newBook: widget.book, newChapter: chapter, newOffset: scrollOffset);
   }
 
   prevChapter() => setChapter((int.parse(chapter) - 1).toString());
@@ -64,10 +64,33 @@ class ReadingPageState extends State<ReadingPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const ReadingDrawer(),
         appBar: AppBar(
+          leading: ColoredBox(
+            color: themePrimary,
+            child: InkWell(
+              hoverColor: themePrimaryLight,
+              child: const Align(
+                alignment: Alignment(0, -.2),
+                child: Text(
+                  "β",
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: themeAccent,
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
           title: Text("${widget.book} $chapter"),
           actions: [
             if (chapterData != null) ...[
@@ -90,94 +113,6 @@ class ReadingPageState extends State<ReadingPage> {
 
   static ReadingPageState? of(BuildContext context) {
     return context.findAncestorStateOfType<ReadingPageState>();
-  }
-}
-
-class ReadingDrawer extends StatelessWidget {
-  const ReadingDrawer({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final readingWidget = ReadingPageState.of(context);
-    return Drawer(
-      child: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: themePaddingEdgeInset,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton.filled(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      "${readingWidget?.widget.book} ${readingWidget?.chapter}",
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(28, 16, 28, 10),
-              child: Divider(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints.tight(const Size(double.infinity, 50)),
-                child: FilledButton.icon(
-                  icon: const Icon(Icons.home),
-                  onPressed: () => Navigator.popUntil(context, (route) {
-                    return route.isFirst;
-                  }),
-                  label: const Text("Home"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints.tight(const Size(double.infinity, 50)),
-                child: FilledButton.icon(
-                  icon: const Icon(Icons.bookmark),
-                  onPressed: () => Navigator.popUntil(context, (route) {
-                    return route.isFirst;
-                  }),
-                  label: const Text("Add Bookmark"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints.tight(const Size(double.infinity, 50)),
-                child: FilledButton.icon(
-                  icon: const Icon(Icons.book),
-                  onPressed: () => Navigator.popUntil(context, (route) {
-                    return route.isFirst;
-                  }),
-                  label: const Text("Greek Resources"),
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(28, 16, 28, 10),
-              child: Divider(),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -220,50 +155,48 @@ class ChapterWidgetState extends State<ChapterWidget> {
   @override
   Widget build(BuildContext context) {
     final chapter = ReadingPageState.of(context)!.chapter;
-    return SingleChildScrollView(
-      controller: _controller,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Wrap(
-          children: [
-            ChapterSlider(
-              chapter: chapter,
-            ),
-            if (widget.chapterData != null) ...[
-              for (var j = 1;
-                  j != widget.chapterData!["verses"].length;
-                  j++) ...[
-                Text(
-                  j.toString(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                for (var greekword in widget.chapterData!["verses"]
-                    [j.toString()])
-                  GestureDetector(
-                    onTap: () {
-                      showBottomSheet(
-                        context: context,
-                        builder: (context) => BottomSheetWidget(
-                          word: Map.from(greekword),
-                          minimized: true,
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 8),
-                      child: Text(
-                        '${greekword["gr"]} ${greekword["pu"] ?? ""}',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+    return ListView(controller: _controller, children: [
+      ChapterSlider(
+        chapter: chapter,
+      ),
+      if (widget.chapterData case Map<String, dynamic> chapterData)
+        Padding(
+            padding: const EdgeInsets.all(10),
+            child: RichText(
+                text: TextSpan(children: [
+              for (var j = 1; j != chapterData["verses"].length; j++) ...[
+                WidgetSpan(
+                  child: Transform.translate(
+                    offset: const Offset(0, -8), // Adjust the Y value as needed
+                    child: Text(
+                      "$j ",
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
-              ],
-            ],
-          ],
-        ),
-      ),
-    );
+                ),
+                for (var greekword in chapterData["verses"][j.toString()])
+                  TextSpan(
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      wordSpacing: 8,
+                      height: 2,
+                    ),
+                    text: '${greekword["gr"]} ${greekword["pu"] ?? ""} ',
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        showBottomSheet(
+                          context: context,
+                          builder: (context) => BottomSheetWidget(
+                            word: Map.from(greekword),
+                            minimized: true,
+                          ),
+                        );
+                      },
+                  )
+              ]
+            ])))
+    ]);
   }
 }
 

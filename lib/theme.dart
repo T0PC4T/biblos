@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-const themePrimary = Color.fromARGB(255, 191, 160, 224);
-const themePrimaryLight = Color.fromARGB(255, 100, 151, 255);
-const themePrimaryLightLight = Color.fromARGB(255, 216, 227, 255);
-const themeOnPrimary = Colors.white;
-const themeSecondary = Color.fromARGB(255, 80, 121, 255);
-const themeBackground = Colors.white;
-const themeDark = Color.fromARGB(255, 56, 37, 59);
-const themeDarkLight = Color.fromARGB(255, 204, 204, 212);
-const themeLight = Color.fromARGB(255, 231, 231, 231);
+const themeSecondary = Color.fromARGB(255, 93, 89, 131);
+const themeSecondaryLight = Color.fromARGB(255, 171, 182, 211);
 
-const themePadding = 18.0;
+const themePrimary = Color.fromARGB(255, 32, 48, 79);
+const themePrimaryLight = Color.fromARGB(255, 171, 182, 211);
+
+const themeAccent = Color.fromARGB(255, 253, 185, 93);
+
+const themeLight = Color.fromARGB(255, 248, 250, 255);
+const themeDark = Color.fromARGB(255, 46, 44, 57);
+const cardColor = themeLight;
+
+const themePadding = 15.0;
 const themePaddingEdgeInset = EdgeInsets.all(themePadding);
 double sideMargin(BuildContext context) {
   Size size = MediaQuery.of(context).size;
@@ -18,23 +20,12 @@ double sideMargin(BuildContext context) {
 }
 
 // Based on material 3
-const double themeRadius = 15;
+const double themeRadius = 10;
 const themeCircularRadius = Radius.circular(30);
 const themeBorderRadius = BorderRadius.all(themeCircularRadius);
 
-const textBigHeading = TextStyle(fontSize: 40, color: themeDark);
-
-const textSubheading = TextStyle(fontSize: 35, color: themeDark);
-
-const textSubheadingHighlight = TextStyle(fontSize: 35, color: themePrimary);
-
-const textNormalLight = TextStyle(color: themeLight);
-const textLargeText = TextStyle(fontSize: 15, height: 2);
-const textThemeMore = TextStyle(fontSize: 20);
-const textThemeMoreLight = TextStyle(fontSize: 20, color: themeBackground);
-
-const blobHeight = 60.0;
-const blobWidth = 180.0;
+const blobHeight = 50.0;
+const blobWidth = 200.0;
 const MENU_WIDTH = 250.0;
 
 final ThemeData currentTheme = AppTheme.lightTheme;
@@ -52,8 +43,55 @@ class AppTheme with ChangeNotifier {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: themePrimary,
+        seedColor: themeSecondary,
         brightness: Brightness.light,
+        onPrimary: themeLight,
+        primary: themePrimary,
+        secondary: themeSecondary,
+      ),
+      scaffoldBackgroundColor: themeLight,
+      cardColor: cardColor,
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 30,
+          color: themeAccent,
+          fontWeight: FontWeight.normal,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 26,
+          color: themeLight,
+          fontWeight: FontWeight.normal,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 20,
+          color: themeLight,
+          fontWeight: FontWeight.normal,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          color: themeDark,
+          fontWeight: FontWeight.normal,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          color: themeDark,
+          fontWeight: FontWeight.normal,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          color: themeDark,
+          fontWeight: FontWeight.bold,
+        ),
+        // You can define more text styles here
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: themeAccent,
+          foregroundColor: themePrimary,
+          minimumSize: const Size.fromHeight(
+              50), // This makes the button take full width
+          shape: const RoundedRectangleBorder(borderRadius: themeBorderRadius),
+        ),
       ),
     );
   }
@@ -64,26 +102,3 @@ class AppTheme with ChangeNotifier {
 }
 
 final themeData = AppTheme.lightTheme;
-
-get disableButtonStyle => ButtonStyle(
-      elevation: MaterialStateProperty.all(0),
-      minimumSize: MaterialStateProperty.all(const Size(blobWidth, blobHeight)),
-      maximumSize:
-          MaterialStateProperty.all(const Size(double.infinity, blobHeight)),
-      backgroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.hovered)) {
-          return themeDarkLight;
-        }
-        return themeDark;
-      }),
-      foregroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.hovered)) {
-          return themeOnPrimary;
-        }
-        return themeOnPrimary;
-      }),
-      padding: MaterialStateProperty.all(
-        const EdgeInsets.all(15),
-      ),
-      textStyle: const MaterialStatePropertyAll(textThemeMore),
-    );
