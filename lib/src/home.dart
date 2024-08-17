@@ -34,6 +34,9 @@ class HomePageState extends State<HomePage> {
 
   /// Loads a banner ad.
   void loadAd() {
+    if (!Platform.isAndroid && Platform.isIOS) {
+      return;
+    }
     _bannerAd ??= BannerAd(
       adUnitId: adUnitId,
       request: const AdRequest(),
@@ -137,7 +140,8 @@ class HomeTitleWidgetState extends State<HomeTitleWidget> {
       // margin: const EdgeInsets.all(themePadding),
       padding: themePaddingEdgeInset,
       width: double.infinity,
-      height: blobHeight * 2,
+      height: blobHeight * 1.5,
+      clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(
         color: themePrimary,
         borderRadius: BorderRadius.only(
@@ -198,7 +202,6 @@ class BookLibraryWidget extends StatelessWidget {
           },
           child: Container(
             width: double.infinity,
-            // padding: themePaddingEdgeInset,
             margin: themePaddingEdgeInset,
             decoration: const BoxDecoration(
               color: themePrimary,

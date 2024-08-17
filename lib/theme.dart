@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const themeSecondary = Color.fromARGB(255, 93, 89, 131);
-const themeSecondaryLight = Color.fromARGB(255, 171, 182, 211);
+const themeSecondaryLight = Color.fromARGB(255, 222, 231, 255);
 
 const themePrimary = Color.fromARGB(255, 32, 48, 79);
 const themePrimaryLight = Color.fromARGB(255, 171, 182, 211);
@@ -12,7 +12,7 @@ const themeLight = Color.fromARGB(255, 248, 250, 255);
 const themeDark = Color.fromARGB(255, 46, 44, 57);
 const cardColor = themeLight;
 
-const themePadding = 15.0;
+const themePadding = 10.0;
 const themePaddingEdgeInset = EdgeInsets.all(themePadding);
 double sideMargin(BuildContext context) {
   Size size = MediaQuery.of(context).size;

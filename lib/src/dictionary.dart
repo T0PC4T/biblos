@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:biblos/src/services/inflections.dart';
 import 'package:biblos/theme.dart';
@@ -159,9 +158,8 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
   Future fetchStrong() async {
     // for (var letter in [""]) {
     for (var letter in ["", "a", "b", "c"]) {
-      final filePath = "assets/Strong/${widget.word['st']}$letter.json";
-      final bExists = await File(filePath).exists();
-      if (bExists) {
+      final filePath = "assets/strong/${widget.word['st']}$letter.json";
+      try {
         final String response = await rootBundle.loadString(filePath);
         final result = jsonDecode(response) as Map;
         if (context.mounted) {
@@ -169,19 +167,23 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
             strongData.add(result);
           });
         }
+      } catch (e) {
+        // file is not found but that's ok
       }
     }
   }
 
   Future fetchLSJ() async {
     final filePath = "assets/LSJ/${widget.word['st']}.html";
-    if (await File(filePath).exists()) {
+    try {
       final String response = await rootBundle.loadString(filePath);
       if (context.mounted) {
         setState(() {
           lsData = response;
         });
       }
+    } catch (e) {
+      // file not found also fine
     }
   }
 
@@ -219,17 +221,17 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
             'Usage: ${strongDatum["us"]}',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const Divider(
-            height: themePadding * 2,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: themePadding),
-            child: Text(
-              "From Liddell & Scott (${strongDatum["gr"]}):",
-              style: Theme.of(context).textTheme.labelSmall,
+          if (lsData case String data when data.isNotEmpty) ...[
+            const Divider(
+              height: themePadding * 2,
             ),
-          ),
-          if (lsData case String data)
+            Padding(
+              padding: const EdgeInsets.only(bottom: themePadding),
+              child: Text(
+                "From Liddell & Scott (${strongDatum["gr"]}):",
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ),
             HtmlWidget(
               data,
               textStyle: const TextStyle(fontSize: 16),
@@ -237,6 +239,7 @@ class StrongEntryWidgetState extends State<StrongEntryWidget> {
                 return {'text-decoration': 'none'};
               },
             ),
+          ]
         ]
       ],
     );
