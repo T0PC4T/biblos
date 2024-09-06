@@ -4,6 +4,7 @@ const themeSecondary = Color.fromARGB(255, 93, 89, 131);
 const themeSecondaryLight = Color.fromARGB(255, 222, 231, 255);
 
 const themePrimary = Color.fromARGB(255, 32, 48, 79);
+const themePrimaryAccent = Color.fromARGB(255, 0, 38, 114);
 const themePrimaryLight = Color.fromARGB(255, 171, 182, 211);
 
 const themeAccent = Color.fromARGB(255, 253, 185, 93);
@@ -14,14 +15,16 @@ const cardColor = themeLight;
 
 const themePadding = 10.0;
 const themePaddingEdgeInset = EdgeInsets.all(themePadding);
+const double strokeWidth = 2;
+
 double sideMargin(BuildContext context) {
   Size size = MediaQuery.of(context).size;
   return (size.width - 1200).clamp(themePadding * 2, double.infinity) / 2;
 }
 
 // Based on material 3
-const double themeRadius = 10;
-const themeCircularRadius = Radius.circular(30);
+const double themeRadius = 25;
+const themeCircularRadius = Radius.circular(themeRadius);
 const themeBorderRadius = BorderRadius.all(themeCircularRadius);
 
 const blobHeight = 50.0;

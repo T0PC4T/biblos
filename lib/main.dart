@@ -1,13 +1,15 @@
-import 'package:biblos/src/home.dart';
-import 'package:biblos/src/services/ls.dart';
+import 'package:biblos/src/screens/home.dart';
 import 'package:biblos/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(child: MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -18,16 +20,9 @@ class MyApp extends StatefulWidget {
 }
 
 class AppWidgetState extends State<MyApp> {
-  AppDataClass appData = AppDataClass();
-
   @override
   void initState() {
-    appData.initialize();
     super.initState();
-  }
-
-  static AppWidgetState? of(BuildContext context) {
-    return context.findAncestorStateOfType<AppWidgetState>();
   }
 
   // This widget is the root of your application.

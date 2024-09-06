@@ -1,8 +1,7 @@
 name: biblos
+# com.example.biblos -> github.T0PC4T.biblos #
 description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -40,6 +39,9 @@ dependencies:
   shared_preferences: ^2.2.3
   flutter_widget_from_html: ^0.15.1
   google_mobile_ads: ^5.1.0
+  riverpod: ^2.5.1
+  riverpod_lint: ^2.3.13
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   flutter_test:
@@ -86,39 +88,6 @@ flutter:
   
   assets:
       - assets/
-      - assets/strong/
-      - assets/LSJ/
-      - assets/books/Matthew/
-      - assets/books/Mark/
-      - assets/books/Luke/
-      - assets/books/John/
-      - assets/books/Acts/
-      - assets/books/1_Corinthians/
-      - assets/books/1_John/
-      - assets/books/1_Peter/
-      - assets/books/1_Thessalonians/
-      - assets/books/1_Timothy/
-      - assets/books/2_Corinthians/
-      - assets/books/2_John/
-      - assets/books/2_Peter/
-      - assets/books/2_Thessalonians/
-      - assets/books/2_Timothy/
-      - assets/books/3_John/
-      - assets/books/Colossians/
-      - assets/books/Ephesians/
-      - assets/books/Galatians/
-      - assets/books/Hebrews/
-      - assets/books/James/
-      - assets/books/John/
-      - assets/books/Jude/
-      - assets/books/Luke/
-      - assets/books/Mark/
-      - assets/books/Matthew/
-      - assets/books/Philemon/
-      - assets/books/Philippians/
-      - assets/books/Revelation/
-      - assets/books/Romans/
-      - assets/books/Titus/
 
   # example:
   # fonts:
