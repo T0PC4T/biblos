@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 const themeSecondary = Color.fromARGB(255, 93, 89, 131);
 const themeSecondaryLight = Color.fromARGB(255, 222, 231, 255);
 
-const themePrimary = Color.fromARGB(255, 32, 48, 79);
+const themePrimary = Color(0xFF20304F);
 const themePrimaryAccent = Color.fromARGB(255, 0, 38, 114);
 const themePrimaryLight = Color.fromARGB(255, 171, 182, 211);
 
-const themeAccent = Color.fromARGB(255, 253, 185, 93);
+const themeAccent = Color(0xFFFDB95D);
 
 const themeLight = Color.fromARGB(255, 248, 250, 255);
 const themeDark = Color.fromARGB(255, 46, 44, 57);

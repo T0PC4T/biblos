@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:biblos/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -59,10 +60,16 @@ class _BannerAdState extends State<BannerAdContainer> {
   @override
   Widget build(BuildContext context) {
     if (_isLoaded) {
-      return SizedBox(
-        width: _bannerAd!.size.width.toDouble(),
+      return Container(
+        color: themeLight,
+        width: double.infinity,
         height: _bannerAd!.size.height.toDouble(),
-        child: AdWidget(ad: _bannerAd!),
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: _bannerAd!.size.width.toDouble(),
+          height: _bannerAd!.size.height.toDouble(),
+          child: AdWidget(ad: _bannerAd!),
+        ),
       );
     } else {
       return const SizedBox();

@@ -1,3 +1,4 @@
+import 'package:biblos/src/components/error.dart';
 import 'package:biblos/src/providers/bookmarks.dart';
 import 'package:biblos/src/providers/lastmark.dart';
 import 'package:biblos/src/providers/providers.dart';
@@ -120,15 +121,13 @@ class HomeTitleWidgetState extends ConsumerState<HomeTitleWidget> {
         children: [
           GestureDetector(
             onTap: () {
-              if (lastMark.valueOrNull case MarkedBook lm) {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ReadingPage(
-                    book: lm.book,
-                    chapter: lm.chapter,
-                    verse: lm.verse,
-                  ),
-                ));
-              }
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ReadingPage(
+                  book: lastMark.valueOrNull?.book ?? "Matthew",
+                  chapter: lastMark.valueOrNull?.chapter ?? 1,
+                  verse: lastMark.valueOrNull?.verse ?? 1,
+                ),
+              ));
             },
             child: Container(
               decoration: BoxDecoration(
@@ -192,12 +191,8 @@ class BookLibraryWidget extends ConsumerWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: watchData.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stackTrace) => const Center(
-                  child: Text(
-                "Something went wrong",
-                style: TextStyle(color: Colors.red),
-              )),
+          loading: loadingFunc,
+          error: ErrorBoxWidget.err,
           data: (chapterData) {
             return ListView(
               children: [

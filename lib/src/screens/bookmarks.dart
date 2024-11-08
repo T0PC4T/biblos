@@ -35,14 +35,21 @@ class BookMarksScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           child: bookMarks.when(
             data: (data) {
+              final allBookmarks = data.keys.where(
+                (e) {
+                  return data[e]?.chapter != 1 || data[e]?.verse != 1;
+                },
+              ).toList();
               return Column(
                 children: [
-                  for (var bookmark in data.keys.where(
-                    (element) {
-                      return data[element]?.chapter != 1 &&
-                          data[element]?.verse != 1;
-                    },
-                  ))
+                  if (allBookmarks.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(themePadding * 2),
+                        child: Text("You have no bookmarks!"),
+                      ),
+                    ),
+                  for (var bookmark in allBookmarks)
                     Padding(
                       padding: themePaddingEdgeInset,
                       child: ListTile(

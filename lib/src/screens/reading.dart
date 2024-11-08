@@ -28,6 +28,7 @@ class ReadingPage extends ConsumerStatefulWidget {
 
 class ReadingPageState extends ConsumerState<ReadingPage> {
   int chapter = 1;
+  int verse = 1;
 
   setChapter(int newChapter) async {
     setState(() {
@@ -37,7 +38,6 @@ class ReadingPageState extends ConsumerState<ReadingPage> {
   }
 
   void bookmark(int verse) {
-    print("BOOKMARKING");
     ref.read(lastBookMarkNotifier.notifier).save(
           MarkedBook(widget.book, chapter, verse),
         );
@@ -51,6 +51,7 @@ class ReadingPageState extends ConsumerState<ReadingPage> {
   void initState() {
     super.initState();
     chapter = widget.chapter;
+    verse = widget.verse;
   }
 
   @override
@@ -78,7 +79,7 @@ class ReadingPageState extends ConsumerState<ReadingPage> {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.popUntil(context, (route) => route.isFirst);
               },
             ),
           ),
@@ -104,7 +105,7 @@ class ReadingPageState extends ConsumerState<ReadingPage> {
             data: (chapterData) {
               return ChapterWidget(
                 chapterData: chapterData,
-                startingVerse: widget.verse,
+                startingVerse: verse,
               );
             }));
   }
@@ -126,12 +127,14 @@ class ChapterWidget extends StatefulWidget {
 
 class ChapterWidgetState extends State<ChapterWidget> {
   ScrollController? _scrollController;
-  GlobalKey bottomControllerKey = GlobalKey();
+  GlobalKey<SynBottomSheetState> bottomSheetKey = GlobalKey();
   GlobalKey bodyKey = GlobalKey();
   Future? scrollFutureLock;
+  Map? focusWord;
 
   @override
   void initState() {
+    print("INTIATING WIDGET");
     _scrollController = ScrollController();
     _scrollController?.addListener(onScroll);
     SchedulerBinding.instance.addPostFrameCallback(
@@ -207,7 +210,7 @@ class ChapterWidgetState extends State<ChapterWidget> {
                   WidgetSpan(
                     child: Transform.translate(
                       offset:
-                          const Offset(0, -8), // Adjust the Y value as needed
+                          const Offset(-1, -8), // Adjust the Y value as needed
                       child: Text(
                         "$j ",
                         style: const TextStyle(fontSize: 12),
@@ -218,7 +221,7 @@ class ChapterWidgetState extends State<ChapterWidget> {
                       [j.toString()])
                     TextSpan(
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         color: Colors.black,
                         wordSpacing: 8,
                         height: 2,
@@ -226,14 +229,14 @@ class ChapterWidgetState extends State<ChapterWidget> {
                       text: '${greekword["gr"]} ${greekword["pu"] ?? ""} ',
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
-                          if (bottomControllerKey.currentContext?.mounted ??
-                              false) {
-                            Navigator.pop(context);
+                          if (bottomSheetKey.currentContext?.mounted ?? false) {
+                            bottomSheetKey.currentState
+                                ?.updateWord(Map.from(greekword));
                           } else {
                             showBottomSheet(
                               context: context,
-                              builder: (context) => BottomSheetWidget(
-                                key: bottomControllerKey,
+                              builder: (context) => SynBottomSheet(
+                                key: bottomSheetKey,
                                 word: Map.from(greekword),
                                 minimized: true,
                               ),
@@ -245,7 +248,10 @@ class ChapterWidgetState extends State<ChapterWidget> {
               ],
             ),
           ),
-        )
+        ),
+        const SizedBox(
+          height: 50,
+        ),
       ]),
     );
   }

@@ -2,18 +2,37 @@ import 'package:biblos/src/screens/dictionary.dart';
 import 'package:biblos/theme.dart';
 import 'package:flutter/material.dart';
 
-class BottomSheetWidget extends StatelessWidget {
+class SynBottomSheet extends StatefulWidget {
   final Map word;
   final bool minimized;
-  const BottomSheetWidget(
+  const SynBottomSheet(
       {super.key, required this.word, required this.minimized});
+
+  @override
+  State<SynBottomSheet> createState() => SynBottomSheetState();
+}
+
+class SynBottomSheetState extends State<SynBottomSheet> {
+  Map word = {};
+
+  @override
+  void initState() {
+    word = widget.word;
+    super.initState();
+  }
+
+  updateWord(Map newWord) {
+    setState(() {
+      word = newWord;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (minimized)
+        if (widget.minimized)
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: Navigator.of(context).pop,
@@ -39,7 +58,7 @@ class BottomSheetWidget extends StatelessWidget {
               const Divider(
                 height: themePadding * 2,
               ),
-              if (minimized == true)
+              if (widget.minimized == true)
                 ElevatedButton(
                   child: const Text("View Full Entry"),
                   onPressed: () {
@@ -50,7 +69,7 @@ class BottomSheetWidget extends StatelessWidget {
                     ));
                   },
                 ),
-              if (minimized == false)
+              if (widget.minimized == false)
                 FullDictionaryEntryWidget(
                   word: word,
                   entry: word["st"],

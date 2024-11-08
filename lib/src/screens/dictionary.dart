@@ -20,7 +20,7 @@ class DictionaryPage extends StatelessWidget {
         foregroundColor: themeLight,
       ),
       body: SingleChildScrollView(
-          child: BottomSheetWidget(minimized: false, word: word)),
+          child: SynBottomSheet(minimized: false, word: word)),
     );
   }
 }
@@ -40,7 +40,7 @@ class SynopsisWidget extends StatelessWidget {
         RichText(
             text: TextSpan(children: [
           TextSpan(
-            text: '${word["gr"]}\t\t',
+            text: '${word["gr"]}\t',
             style: Theme.of(context)
                 .textTheme
                 .headlineMedium
@@ -52,7 +52,7 @@ class SynopsisWidget extends StatelessWidget {
             size: 16,
           )),
           TextSpan(
-            text: ' ${word["tl"]}\n',
+            text: '${word["tl"]}\n\n',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           TextSpan(
@@ -80,7 +80,7 @@ class SynopsisWidget extends StatelessWidget {
             text: "${codeToWord(word["pa"]).trim()}\n",
             style: Theme.of(context)
                 .textTheme
-                .headlineSmall
+                .bodyLarge
                 ?.copyWith(color: themePrimary, fontWeight: FontWeight.bold),
           ),
         ]))
@@ -123,21 +123,49 @@ class FullDictionaryEntryWidget extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '${strongDatum["gr"]}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Text(
-                'Speech: ${strongDatum["pos"]}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Text(
-                'Meaning: ${strongDatum["df"]}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Text(
-                'Usage: ${strongDatum["us"]}',
-                style: Theme.of(context).textTheme.bodyLarge,
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: strongDatum["gr"],
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '\nspeech: ',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  TextSpan(
+                    text: strongDatum["pos"].toString().toLowerCase(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '\nmeaning: ',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  TextSpan(
+                    text: strongDatum["df"],
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '\nusage: ',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  TextSpan(
+                    text: strongDatum["us"],
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ]),
               ),
               lsDataProvider.when(
                 data: (lsData) {
